@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
+
+    <title>بسم الله الرحمن الرحيم</title>
+
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/template.css">
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+
+	<script src="js/jquery-2.2.2.min.js"></script>
+	<!--<script src="js/console.log.js"></script>-->
+    <script src="cordova.js"></script>
+    <script src="js/jquery.md5.js"></script>
+    <script src="js/fastclick.js"></script>
+    <script src="js/hammer.min.js"></script>
+    <script src="js/back_btn.js"></script>
+	<script src="js/notification.js"></script>
+	<script src="js/iscroll.js"  type="text/javascript"></script>
+
+	<script>
+		function init() {		
+			console.log('SMGROUP ::::::::::::::::::::::::::::::::::::    start init()');
+			document.addEventListener("deviceready", onDeviceReady, false);
+
+			var mc = new Hammer(document.body);
+			mc.on("swiperight", function(ev) {
+				go_back_adab();
+			});
+			var isAlreadyLoading = 0, jump = false;
+ 			var myScroll = new iScroll('smm_adab_wrapper', { hideScrollbar: true, bounce : "enable",useTransition: true });
+			/*****************************/
+		}
+
+		function onDeviceReady() {
+			console.log('SMGROUP ::::::::::::::::::::::::::::::::::::    start onDeviceReady()');
+			var networkState = navigator.connection.type;
+
+			FastClick.attach(document.body);
+ 			if ( device.platform == 'Android' ){//Android,iOS,win7=WinCE,win8=Win32NT
+ 				document.addEventListener("backbutton", go_back_adab, false);
+ 			}
+			
+			register_notification();
+			
+			
+			
+			
+			
+
+		}
+
+		$(window).load(function() {		
+			setTimeout(function(){
+				$(".mypreload").html("");
+			}, 800);
+		
+		});
+
+
+		$(document).ready(function(){
+			
+		});
+		
+	</script>	
+
+		
+		
+		
+<style>
+
+
+</style>	
+</head>
+<body onload="init();" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" id="body" class="smm_ziarat_body retina">
+	<div class="bg" ></div>
+	<div class="container " id="container" >
+			<div id="ajax" class="mypreload">
+				<div style="z-index: 1000; border: medium none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; background-color: #1e92c4; opacity: 1; cursor: default; position: fixed;overflow:visible;" class="blockUI blockOverlay"></div>
+				<div style="z-index: 1011; position: fixed; padding: 0px; margin: 0px; width: 100%; top: 28%; left: 0%; text-align: center;border: medium none;overflow:visible;" class="blockUI blockMsg blockPage"><img src="images/preloader.gif"></div>
+				<div style="z-index: 1012; position: fixed; padding: 0px; margin: 0px; width: 100%; top: 50%; left: 0%; text-align: center;border: medium none;overflow:visible;height:500px;" class="blockUI blockMsg blockPage"><img src="images/loading.png" width="70%"></div>
+			</div>
+		<div class="smm_content">
+			<div class="smm_adab_title retina">
+				<a href="#" onclick="goto_perv_page('adab.html',false);">
+					<span class="smm_ziarat_back"></span>
+				</a>
+			</div>
+			<div class="smm_adab_content">
+				<div id="smm_adab_wrapper" style="position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 1vw;
+    overflow: auto;
+    text-align: right;">
+					<div>
+						<p class="smm_adab_subject">
+							  من آداب زيارة المعصومين (عليهم السلام)
+						</p>
+						<div class="smm_adab_text" style="margin-bottom: 10vw;padding-bottom: 10vw;">
+                        
+                        
+                      
+لقد وردت عن آل البيت عليهم السلام جملة من الآداب التي يُستحسن للزَّائر أن يتحلَّى بها، إذ إنَّ التَّحلِّي بها يعكِسُ إرادةً جدّيةً عند الزائر في إظهار ارتباطه الحقيقي بالمزور وعلاقته المعنوية به، ومن هذه الآداب:
+<br/>
+1- الصَّلاة عنده: روي عن الإمام الصادق عليه السلام: "من زار إماماً من الأئمّة، وصلّى عنده أربع ركعات كتبت له حجّة وعمرة"1.
+<br/>
+2- اختيار الأوقات الشَّريفة: حيث جاء في الروايات تحديد أوقات عديدة لزيارة الأئمّة عليهم السلام، إذ ورد استحباب زيارة الإمام الحسين عليه السلام على سبيل المثال ليلة عرفة ويوم عرفة ويوم العيد (الأضحى)، وأوّل رجب ونصفه، وفي نصف شعبان، ليلة القدر، وفي شهر رمضان خصوصاً أوّل ليلة وآخر ليلة وليلة النصف، وفي ليلة الفطر والأضحى ويوم عاشوراء وليلته، وغير ذلك من الأوقات الشَّريفة التي أكّدت عليها الروايات، وفي خصوص زيارة الإمام الحسين ورد عن الإمام الصادق عليه السلام قوله: "زوروه في كلّ وقت، وفي كلّ حين"2.
+<br/>
+3- زيارة الرسول صلى الله عليه وآله وسلم والأئمّة عليهم السلام بعد إتمام الحجّ: فقد روي عن أمير المؤمنين علي بن أبي طالب عليه السلام قال: "أتمّوا بزيارة رسول الله صلى الله عليه وآله وسلم حجّكم، فإنّ تركه بعد الحجّ جفاء. وبذلك أمرتم بالقبور التي ألزمكم الله عزَّ وجلَّ حقّها وزيارتها"3.
+<br/>
+4- استحباب المشي في زيارته ذاهباً وعائداً، إذ روي عن الإمام الصادق عليه السلام في زيارة الإمام علي بن أبي طالب عليه السلام: "من زار جدّي عارفاً بحقّه، كتب الله له بكلّ خطوة حجّة مقبولة وعمرة مبرورة. واللَّه، ما تطعم النار قدماً تغيّرت في زيارة قبر أمير المؤمنين علي بن أبي طالب عليه السلام ماشياً كان، أو راكباً"4.
+<br/>
+5- استحباب وضع الطيب ولبس ثوبين طاهرين: فعن الإمام الصَّادق عليه السلام: "إذا أردت ذلك، فاغتسل والبس ثوبيك طاهرين غسيلين أو جديدين، ونل شيئاً من الطيب، فإن لم تنل، أجزأك"5.
+<br/>
+6- الاغتسال: عن الإمام الصادق عليه السلام: "إذا أتيت مشهد أمير المؤمنين علي بن أبي طالب عليه السلام، فاغتسل غسل الزِّيارة"6.
+<br/>
+7- المشي بالسكينة والوقار: فعن الإمام الصادق عليه السلام: "والبس أنظف ثيابك، وشمّ شيئا من الطيب، وامشِ وعليك السكينة والوقار"7. وروي أيضاً: "أنَّه يتحفّى، ويقصّر خطاه، ويلقي ذقنه إلى الأرض"8.
+<br/>
+8- زيارته بهيئة حزينة: فقد روي عن أبي عبد الله عليه السلام قال: "إذا أردت زيارة الحسين عليه السلام فزره وأنت حزين مكروب، شعث مغبر، جائع عطشان، وسله الحوائج وانصرف عنه ولا تتّخذه وطنا"9.
+<br/>
+9- استحباب الانفاق في السفر إليه والإقامة عنده: فقد قيل للصادق عليه السلام: "هل يزار والدك؟ قال: نعم، ويصلَّى عنده، وقال: يصلَّى خلفه ولا يتقدّم عليه، قيل: فما لمن أقام عنده؟ قال: كلّ يوم بألف شهر، قيل: فما للمنفق في خروجه إليه والمنفق عنده؟ قال: كلّ درهم بألف درهم، قيل: فما لمن تجهّز إليه ولم يخرج لعلَّة تصيبه؟ قال: يعطيه الله بكلّ درهم ينفقه مثل أحد من الحسنات، ويخلف عليه أضعاف ما أنفق"10.
+<br/>
+10- الاستئذان للدخول في الروضات الشَّريفة: حيث يستحب أن يستئذن في الدخول إلى الروضات الشَّريفة، ومما روي من الاستئذان: "اللّهُمَّ إِنِّي وَقَفْتُ عَلى بابٍ مِنْ أَبْوابِ بُيُوتِ نَبِيِّكَ صَلَواتُكَ عَلَيْهِ وَآلِهِ، وَقَدْ مَنَعْتَ النَّاسَ أَنْ يَدْخُلُوا إِلاّ بِإِذْنِهِ، فَقُلْتَ: ﴿يَا أَيُّهَا الَّذِينَ آمَنُوا لَا تَدْخُلُوا بُيُوتَ النَّبِيِّ إِلَّا أَن يُؤْذَنَ لَكُمْ﴾، اللّهُمَّ، إِنِّي أَعْتَقِدُ حُرْمَةَ صاحِبِ هذا المَشْهَدِ الشَّرِيفِ فِي غَيْبَتِهِ كَما أَعْتَقِدُها فِي حَضْرَتِهِ، وَأَعْلَمُ أَنَّ رَسُولَكَ وَخُلَفائَكَ عليه السلام أَحْياءٌ عِنْدَكَ يُرْزَقُونَ، يَرَوْنَ مَقامِي وَيَسْمَعُونَ كَلامِي وَيَرُدُّونَ سَلامِي، وَأَنَّكَ حَجَبْتَ عَنْ سَمْعِي كَلامَهُمْ وَفَتَحْتَ بابَ فَهْمِي بِلَذِيذِ مُناجاتِهِمْ، وَإِنِّي أَسْتأْذِنُكَ يا رَبِّ أَوَّلاً، وَأَسْتَأْذِنُ رَسُولِكَ صَلَّى الله عَلَيْهِ وَآلِهِ ثانِياً، وَأَسْتَأْذِنُ خَلِيفَتَكَ الإمام المُفْرُوضَ عَلَيَّ طاعَتُهُ "فُلانَ بْنِ فُلانٍ". واذكر اسم الإمام الذي تزوره واسم أبيه11.
+<br/>
+11- استحباب قراءة القرآن عنده: فقد روي عن الإمام الصادق عليه السلام: "ثمّ صلّ أربع ركعات صلاة الزِّيارة بسلامين، واقرأ فيها ما شئت من السور، فإذا فرغت فسبح تسبيّح الزهراء عليها السلام"12. 
+<br/>
+1- الشيخ المفيد، المقنعة، ص474.
+<br/>
+2- الحر العاملي، هداية الأمة إلى أحكام الأئمة عليهم السلام، ج5، ص487.
+<br/>
+3- الشيخ الصدوق، الخصال، ص616.
+<br/>
+4- الحر العاملي، وسائل الشيعة، 14، ص377.
+<br/>
+5- م.ن، ص392.
+<br/>
+6- م.ن.
+<br/>
+7- الشيخ المفيد، المقنعة، ص159.
+<br/>
+8- الحرّ العاملي، هداية الأمة إلى أحكام الأئمة عليهم السلام، ج5، ص474.
+<br/>
+9- الشيخ الكليني، الكافي، ج4، ص587.
+<br/>
+10- الحرّ العاملي، وسائل الشيعة، ج14، ص442.
+<br/>
+11- الكفعمي، البلد الأمين والدرع الحصين، ص276.
+<br/>
+12- السيد ابن طاووس، إقبال الأعمال، ج3، ص126.
+<br/>
+   
+<br/>
+                        
+                        
+                        
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+	</div>
+</body>
+</html>

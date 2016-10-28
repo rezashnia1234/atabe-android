@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1" />
+
+    <title>بسم الله الرحمن الرحيم</title>
+
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/progress.bar.css">
+    <link rel="stylesheet" type="text/css" href="css/template.css">
+    <link rel="stylesheet" type="text/css" href="css/font.css">
+	<style>
+		.progress-bar-parent {
+			background-color: rgba(223, 244, 249, 0.95);
+			display: none;
+			z-index: 50300;
+		}
+	</style>
+	<script src="js/jquery-2.2.2.min.js"></script>
+	<!--<script src="js/console.log.js"></script>-->
+    <script src="cordova.js"></script>
+    <script src="js/jquery.md5.js"></script>
+    <script src="js/fastclick.js"></script>
+    <script src="js/hammer.min.js"></script>
+    <script src="js/back_btn.js"></script>
+	<script src="js/notification.js"></script>
+	<script src="js/iscroll.js"  type="text/javascript"></script>
+	<script>
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////START DOWNLOAD//////////////////////////////////////////////////////////////////////
+		var temp_element;
+		var progress_bar_element;
+		function temp_function() {
+			// do something
+		}
+/////END DOWNLOAD////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+		function init() {		
+			console.log('SMGROUP ::::::::::::::::::::::::::::::::::::    start init()');
+			document.addEventListener("deviceready", onDeviceReady, false);
+			/**** added by mahdi *********/
+			if(isRetina())
+			{
+				$('.retina').each( function(i) {
+					var back = $(this).css('background-image');
+					back = back.replace("/low", "/high");
+					$(this).css('background-image',back);
+				});
+				$('.retina:before').each( function(i) {
+					var back = $(this).css('background-image');
+					back = back.replace("/low", "/high");
+					$(this).css('background-image',back);
+				});
+			}
+			var mc = new Hammer(document.getElementById("hamer_handel"));
+			mc.on("swiperight", function(ev) {
+				go_back_adab();
+			});
+			var isAlreadyLoading = 0, jump = false;
+ 			var myScroll = new iScroll('smm_adab_wrapper', { hideScrollbar: true, bounce : "enable",useTransition: true });
+ 			
+			/*****************************/
+		}
+
+
+		function onDeviceReady() {
+		
+			var networkState = navigator.connection.type;
+
+			FastClick.attach(document.body);
+ 			if ( device.platform == 'Android' ){//Android,iOS,win7=WinCE,win8=Win32NT
+ 				document.addEventListener("backbutton", go_back_adab, false);
+ 			}
+			register_notification();
+			
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////START DOWNLOAD//////////////////////////////////////////////////////////////////////
+			init_audio();
+			
+			$('.play_it').each( function(i) {
+				//$(this).css("display","none");
+				var temp_array = JSON.parse(window.localStorage.getItem('downloaded_files'));
+				if($.inArray($.md5($(this).attr('online')),temp_array) != -1)
+				{
+					$(this).removeClass("need_download").addClass("downloaded");
+				}
+			});
+			$('.play_it').click( function(i) {
+				temp_element = $(this);
+				//alert($(this).attr('online'));
+				
+				//play_or_download('http://imamali.net/app-json/audio/aminalah.mp3','mp3');
+				play_or_download($(this).attr('online'),"mp3");
+			});
+			
+			
+			
+			if(window.localStorage.getItem('downloaded_files') == null){
+				window.localStorage.setItem('downloaded_files',JSON.stringify(["786","110"]));	
+			}
+			
+			
+			if(window.localStorage.getItem('download_address') == null){
+				
+				window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, 
+					function(fs) {
+						window.localStorage.setItem('download_address',fs.root.toURL());
+					}, function(e) {
+						alert('failed to get fs');
+						alert(JSON.stringify(e));
+					}
+				);
+			}
+
+			console.log("window.localStorage.getItem('download_address'):" + window.localStorage.getItem('download_address'));
+			console.log("window.localStorage.getItem('downloaded_files'):" + window.localStorage.getItem('downloaded_files'));
+/////END DOWNLOAD////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+			
+			
+
+		}
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////START DOWNLOAD//////////////////////////////////////////////////////////////////////
+		function play_or_download(URL,Extension) {
+			console.log("play_or_download URL: " + URL);
+			console.log("play_or_download Extension: " + Extension);
+
+			if (device.platform == 'iOS')
+			{
+				downloadPath = "cdvfile://localhost/persistent/";
+				window.localStorage.setItem('download_address',downloadPath);
+			}
+			
+			downloadPath = window.localStorage.getItem('download_address') + $.md5(URL) + "." + Extension;
+			console.log("play_or_download : " + downloadPath);
+			if(temp_element.attr("play_type")=="offline")
+			{
+					console.log("play_or_download : play offline");
+					
+					playAudio_new(URL,false);
+			}
+			else
+			{
+				if(check_download(URL))
+				{
+					console.log("play_or_download : check_download");
+					
+					playAudio_new(downloadPath,true);
+					//var media = new Media(downloadPath, null, function(e) { alert(JSON.stringify(e));});
+					//media.play();
+				}
+				else
+				{
+					console.log("play_or_download : start_download");
+					start_download(URL,Extension);
+				}
+			}
+		}
+
+		function start_download(URL,Extension) {
+			console.log("start_download check internet");
+			networkState = navigator.connection.type;
+			if (networkState == Connection.NONE) {
+				console.log("start_download : NO internet");
+				navigator.notification.alert(
+					'يجب عليك الاتصال بالانترنت',  // message
+					temp_function,         // callback
+					'تنبيه',            // title
+					'نعم'                  // buttonName
+				);
+			}
+			else{
+				console.log("start_download : we have internet");
+
+				console.log("start_download URL: " + URL);
+				console.log("start_download Extension: " + Extension);
+				
+				var FileTransfer_OBJ = new FileTransfer();
+				var uri = encodeURI(URL + "?" + Math.random());
+				
+				if (device.platform == 'iOS')
+				{
+					downloadPath = "cdvfile://localhost/persistent/";
+					window.localStorage.setItem('download_address',downloadPath);
+				}
+				
+				$('.progress-bar-parent').css("display","block");
+				
+				downloadPath = window.localStorage.getItem('download_address') + $.md5(URL) + "." + Extension;
+				console.log("start_download : " + downloadPath);
+				
+				FileTransfer_OBJ.onprogress = function(progressEvent) {
+					if (progressEvent.lengthComputable) {
+						var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
+						$('#status').html(perc + "%");
+						$('.progress-bar-percent').css('width',perc + "%");
+						//progress_bar_element.css('width',perc);
+					} else {
+						$('#status').html($('#status').html() + ".");
+						//progress_bar_element.css('width',progress_bar_element.width()+1);
+						$('.progress-bar-percent').css('width',$('.progress-bar-parent').find('span').width()+1);
+					}
+				};
+				
+				FileTransfer_OBJ.download(uri, downloadPath, 
+					function(entry) {	
+						$('#status').html("");
+						$('.progress-bar-parent').find('span').css('width','2%');
+						console.log("start_download : done");
+						temp_array = JSON.parse(window.localStorage.getItem('downloaded_files'));
+						temp_array.push($.md5(URL));
+						window.localStorage.setItem('downloaded_files',JSON.stringify(temp_array));	
+						
+						temp_element.removeClass("need_download");
+						$('.progress-bar-parent').css("display","none");				
+						$('#play').trigger("click");				
+					}, 
+					function(error) {
+						//alert('Crap something went wrong...');	
+						//alert(JSON.stringify(error));
+						navigator.notification.alert(
+							'فشل في تحميل الملف',  // message
+							temp_function,         // callback
+							'تبيه',            // title
+							'نعم'                  // buttonName
+						);
+						$('.progress-bar-parent').find('span').css('width','2%');
+						$('.progress-bar-percent').css('width',"");
+						$('.progress-bar-parent').css("display","none");
+					},
+					true
+				);
+				
+				$("#abort").click( function(i) {
+					FileTransfer_OBJ.abort();
+					$('.progress-bar-parent').find('span').css('width','2%');
+					$('.progress-bar-percent').css('width',"");
+					$('.progress-bar-parent').css("display","none");
+				});
+				
+			}
+		}
+		
+		function check_download(URL) {
+			console.log("check_download URL: " + URL);
+			var temp_array = JSON.parse(window.localStorage.getItem('downloaded_files'));
+			console.log("check_download Extension: " + window.localStorage.getItem('downloaded_files'));
+			if($.inArray($.md5(URL),temp_array) != -1)
+			{
+				console.log("check_download true");
+				return true;
+			}
+			else
+			{
+				console.log("check_download false");
+				return false;
+			}
+		}
+/////END DOWNLOAD////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+		$(window).load(function() {		
+			setTimeout(function(){
+				$(".mypreload").html("");
+			}, 800);
+		
+		});
+
+		function isHighDensity(){
+			return ((window.matchMedia && (window.matchMedia('only screen and (min-resolution: 124dpi), only screen and (min-resolution: 1.3dppx), only screen and (min-resolution: 48.8dpcm)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (min-device-pixel-ratio: 1.3)').matches)) || (window.devicePixelRatio && window.devicePixelRatio > 1.3));
+		}
+		function isRetina(){
+			return ((window.matchMedia && (window.matchMedia('only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx), only screen and (min-resolution: 75.6dpcm)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min--moz-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2)').matches)) || (window.devicePixelRatio && window.devicePixelRatio >= 2)) && /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
+		}
+		$(document).ready(function(){
+			
+		});
+		
+	</script>	
+
+		
+		
+		
+<style>
+
+
+</style>	
+</head>
+<body onload="init();" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" id="body" class="smm_ziarat_body retina">
+	<div class="bg" ></div>
+	<div class="container " id="container" >
+			<div id="ajax" class="mypreload">
+				<div style="z-index: 1000; border: medium none; margin: 0px; padding: 0px; width: 100%; height: 100%; top: 0px; left: 0px; background-color: #1e92c4; opacity: 1; cursor: default; position: fixed;overflow:visible;" class="blockUI blockOverlay"></div>
+				<div style="z-index: 1011; position: fixed; padding: 0px; margin: 0px; width: 100%; top: 28%; left: 0%; text-align: center;border: medium none;overflow:visible;" class="blockUI blockMsg blockPage"><img src="images/preloader.gif"></div>
+				<div style="z-index: 1012; position: fixed; padding: 0px; margin: 0px; width: 100%; top: 50%; left: 0%; text-align: center;border: medium none;overflow:visible;height:500px;" class="blockUI blockMsg blockPage"><img src="images/loading.png" width="70%"></div>
+			</div>
+		<div class="smm_content" id="hamer_handel">
+			<div class="smm_adab_title retina">
+				<a href="#" onclick="goto_perv_page('adab.html',false);">
+					<span class="smm_ziarat_back"></span>
+				</a>
+			</div>
+			<div class="smm_adab_content">
+				<div id="smm_adab_wrapper" style="position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 1vw;
+    overflow: auto;
+    text-align: right;">
+					<div>
+						<p class="smm_adab_subject">
+							  الزيارة الجامعة الكبيرة
+						</p>
+						<div class="smm_adab_text" style="margin-bottom: 10vw;padding-bottom: 10vw;">
+                        
+                        
+                      
+قال الصدوق في عيون أخبار الرضا (ع) « ١ / ٣٠٤ » : « حدثنا علي بن أحمد بن محمد بن عمران الدقاق رضي الله عنه ، ومحمد بن أحمد السناني ، وعلي بن عبد الوراق ، والحسين بن إبراهيم بن أحمد بن هشام المكتَّب ، قالوا : حدثنا محمد بن أبي عبد الله الكوفي ، وأبوالحسين الأسدي قالوا : حدثنا محمد بن إسماعيل المكي البرمكي قال : حدثنا موسى بن عمران النخعي قال : قلت لعلي بن محمد بن علي بن موسى بن جعفر بن محمد بن علي بن الحسين بن علي بن أبي طالب (ع) : علمني يا ابن رسول الله قولاً أقوله بليغاً كاملاً إذا زرتُ واحداً منكم ، فقال : إذا صرت إلى الباب فقف واشهد الشهادتين ، وأنت على غسل. فإذا دخلت ورأيت القبر فقف وقل : الله أكبر ثلاثين مرة.
+<br/>
+ثم امش قليلاً وعليك السكينة والوقار ، وقارب بين خطاك ، ثم قف وكبر الله عز وجل ثلاثين مرة. ثم ادْنُ من القبر وكبر الله أربعين مرة ، تمام مئة تكبيرة ، ثم قل :
+<br/>
+السلام عليكم يا أهلَ بيت النبوة ، وموضعَ الرسالة ، ومختلفَ الملائكة ، ومهبطَ الوحي ، ومعدنَ الرسالة ، وخزانَ العلم ، ومنتهى الحلم ، وأصولَ الكرم ، وقادةَ الأمم وأولياءَ النعم ، وعناصرَ الأبرار ، ودعائمَ الأخيار ، وساسةَ العباد ، وأركانَ البلاد ، وأبوابَ الإيمان ، وأمناءَ الرحمن ، وسلالةَ النبيين ، وصفوةَ المرسلين ، وعترةَ خِيرة رب العالمين ، ورحمة الله وبركاته.
+<br/>
+السلام على أئمة الهدى ، ومصابيح الدجى ، وأعلام التقى ، وذوي النهى ، وأولي الحجى ، وكهف الورى ، وورثة الأنبيا ، والمثل الأعلى ، والدعوة الحسنى ، وحجج الله على أهل الآخرة والأولى ، ورحمة الله وبركاته.
+<br/>
+السلام على محالِّ معرفة الله ، ومساكن بركة الله ، ومعادن حكمة الله ، وحفظة سر الله وحملة كتاب الله ، وأوصياء نبي الله ، وذرية رسول الله ، ورحمة الله وبركاته.
+<br/>
+السلام على الدعاة إلى الله ، والأدلاء على مرضات الله ، والمستقرين في أمر الله ونهيه ، والتامين في محبة الله ، والمخلصين في توحيد الله ، والمظهرين لأمر الله ونهيه ، وعباده المكرمين ، لايسبقونه بالقول وهم بأمره يعملون ، ورحمة الله وبركاته.
+<br/>
+السلام على الأئمة الدُّعاة ، والقادة الهُداة ، والسادة الوُلاة ، والذادة الحُماة ، أهلِ الذكر وأولي الأمر ، وبقيةِ الله ، وخيرته ، وحزبه ، وعيبة علمه ، وحجته ، وصراطه ، ونوره ، وبرهانه ، ورحمة الله وبركاته.
+<br/>
+أشهد أن لا إله إلا الله ، وحده لا شريك له ، كما شهد الله لنفسه ، وشهدت له ملائكته وأولوالعلم من خلقه ، لا إله إلا هو العزيز الحكيم.
+<br/>
+وأشهد أن محمداً عبده المصطفى ، ورسوله المرتضى ، أرسله بالهدى ودين الحق ، ليظهره على الدين كله ، ولوكره المشركون.
+<br/>
+وأشهد أنكم الأئمة الراشدون ، المهديون المعصومون ، المكرمون المقربون ، المتقون الصادقون ، المصطفوْن المطيعون لله ، القوَّامون بأمره ، العاملون بإرادته ، الفائزون بكرامته ، اصطفاكم بعلمه ، وارتضاكم لدينه ، واختاركم لسره ، واجتباكم بقدرته ، وأعزكم بهداه ، وخصكم ببرهانه ، وانتجبكم لنوره ، وأيدكم بروحه ، ورضيكم خلفاءَ في أرضه ، وحججاً على بريته ، وأنصاراً لدينه وحفظةً لسره ، وخزنةً لعلمه ومستودعاً لحكمته ، وتراجمةً لوحيه ، وأركاناً لتوحيده ، وشهداء على خلقه ، وأعلاماً لعباده ، ومناراً في بلاده ، وأدلاء على صراطه. عصمكم الله من الزلل ، وآمنكم من الفتن ، وطهركم من الدنس ، وأذهب عنكم الرجس ، وطهركم تطهيرا.
+<br/>
+فعظمتم جلاله ، وكبَّرتم شانَه ، ومجَّدتم كرمه ، وأدَمْتُم ذكره ، ووكَّدتم ميثاقه ، وأحكمتم عقدَ طاعته ، ونصحتم له في السر والعلانية ، ودعوتم إلى سبيله بالحكمة والموعظة الحسنة ، وبذلتم أنفسكم في مرضاته ، وصبرتم على ما أصابكم في جنبه ، وأقمتم الصلاة ، وآتيتم الزكاة ، وأمرتم بالمعروف ونهيتم عن المنكر ، وجاهدتم في الله حق جهاده ، حتى أعلنتم دعوته ، وبينتم فرائضه ، وأقمتم حدوده ، ونشرتم شرائع أحكامه ، وسننتم سنته ، وصرتم في ذلك منه إلى الرضا ، وسلمتم له القضا ، وصدقتم من رسله من مضى. فالراغب عنكم مارق ، واللازم لكم لاحق ، والمقصر في حقكم زاهق ، والحق معكم وفيكم ، ومنكم وإليكم ، وأنتم أهله ومعدنه.
+<br/>
+وميراث النبوة عندكم ، وإياب الخلق إليكم ، وحسابهم عليكم ، وفصل الخطاب عندكم ، وآيات الله لديكم ، وعزائمه فيكم ، ونوره وبرهانه عندكم ، وأمره إليكم.
+<br/>
+من والاكم فقد والى الله ، ومن عاداكم فقد عادى الله ، ومن أحبكم فقد أحب الله ، ومن اعتصم بكم فقد اعتصم بالله.
+<br/>
+أنتم السبيلُ الأعظم ، والصراطُ الأقوم ، وشهداءُ دار الفناء ، وشفعاءُ دار البقاء ، والرحمةُ الموصولة ، والآيةُ المخزونة ، والأمانةُ المحفوظة ، والبابُ المبتلى به الناس ، من أتاكم نجا ، ومن لم يأتكم هلك ، إلى الله تدعون ، وعليه تدلون ، وبه تؤمنون ، وله تسلمون ، وبأمره تعملون ، وإلى سبيله ترشدون ، وبقوله تحكمون.
+<br/>
+سَعِدَ والله من والاكم ، وهلك من عاداكم ، وخاب من جحدكم ، وضل من فارقكم وفاز من تمسك بكم ، وأمِنَ من لجأ إليكم ، وسَلِمَ من صدَّقكم ، وهُدِيَ من اعتصم بكم. من اتبعكم فالجنة مأواه ، ومن خالفكم فالنارُ مثواه ، ومن جحدكم كافر ، ومن حاربكم مشرك ، ومن رد عليكم فهو في أسفل درك من الجحيم.
+<br/>
+أشهد أن هذا سابق لكم فيما مضى ، وجارٍ لكم فيما بقي ، وأن أرواحكم ونوركم وطينتكم واحدة ، طابت وطهرت ، بعضها من بعض. خلقكم الله أنواراً فجعلكم بعرشه مُحْدِقِين ، حتى منَّ علينا فجعلكم الله في بيوت أذن الله أن ترفع ويذكر فيها اسمه ، وجعل صلاتنا عليكم وما خصنا به من ولايتكم طِيباً لخَلقنا ، وطهارةً لأنفسنا ، وتزكيةً لنا ، وكفارةً لذنوبنا ، فكنا عنده مُسْلِمين بفضلكم ، ومعروفين بتصديقنا إياكم.
+<br/>
+فبلغ الله بكم أشرف محل المكرمين ، وأعلى منازل المقربين ، وأرفع درجات أوصياء المرسلين ، حيث لا يلحقه لاحق ، ولا يفوقه فائق ، ولا يسبقه سابق ، ولا يطمع في إدراكه طامع ، حتى لا يبقى ملكٌ مقرب ولا نبيٌّ مرسل ، ولا صديقٌ ولا شهيدٌ ، ولا عالمٌ ولا جاهل ، ولا دنيٌّ ولا فاضل ، ولا مؤمنٌ صالح ، ولا فاجرٌ طالح ، ولا جبارٌ عنيد ، ولا شيطانٌ مريد ، ولا خلقٌ فيما بين ذلك شهيد ، إلا عَرَّفَهُمْ جلالة أمركم ، وعِظَمَ خَطَرِكُم ، وكِبَر شأنكم ، وتمام نوركم ، وصِدق مقاعدكم ، وثبات مقامكم ، وشرف محلكم ومنزلتكم عنده ، وكرامتكم عليه وخاصتكم لديه ، وقرب منزلتكم منه.
+<br/>
+بأبي أنتم وأمي ، وأهلي ومالي وأسرتي ، أشهد الله وأشهدكم أني مؤمن بكم وبما آمنتم به. كافرٌ بعدوكم وبما كفرتم به ، مستبصرٌ بشأنكم وبضلالة من خالفكم ، موالٍ لكم ولأوليائكم ، مبغضٌ لأعدائكم ومعاد لهم ، وسلمٌ لمن سالمكم ، وحرب لمن حاربكم ، محقق لما حققتم ، مبطل لما أبطلتم ، مطيع لكم ، عارفٌ بحقكم ، مقرٌّ بفضلكم ، محتملٌ لعلمكم ، محتجبٌ بذمتكم ، معترفٌ بكم ، مؤمنٌ بإيابكم ، مصدقٌ برجعتكم ، منتظرٌ لأمركم ، مرتقبٌ لدولتكم ، آخذٌ بقولكم ، عاملٌ بأمركم ، مستجيرٌ بكم ، زائرٌ لكم عائذٌ بكم ، لائذٌ بقبوركم ، مستشفعٌ إلى الله عز وجل بكم ، ومتقربٌ بكم إليه ، ومقدمُكم أمام طلبتي وحوائجي وإرادتي ، في كل أحوالي وأموري ، مؤمنٌ بسركم
+<br/>
+وعلانيتكم ، وشاهدكم وغائبكم ، وأولكم وآخركم ، ومفوضٌ في ذلك كله إليكم ، ومسلِّمٌ فيه معكم ، وقلبي لكم مؤمن ، ورأيي لكم تبع ، ونصرتي لكم معدة ، حتى يحيي الله تعالى دينه بكم ، ويردكم في أيامه ، ويظهركم لعدله ، ويمكنكم في أرضه.
+<br/>
+فمعكم معكم لا مع عدوكم ، آمنت بكم ، وتوليت آخركم بما توليت به أولكم ، وبرئت إلى الله تعالى من أعدائكم ، ومن الجبت والطاغوت ، والشياطين وحزبهم الظالمين لكم ، والجاحدين لحقكم ، والمارقين من ولايتكم ، والغاصبين لإرثكم ، الشاكين فيكم ، المنحرفين عنكم ، ومن كل وليجة دونكم ، وكل مُطاعٍ سواكم ، ومن الأئمة الذين يدعون إلى النار.
+<br/>
+فثبتني الله أبداً ما حييت على موالاتكم ومحبتكم ودينكم ، ووفقني لطاعتكم ، ورزقني شفاعتكم ، وجعلني من خيار مواليكم ، التابعين لما دعوتم إليه ، وجعلني ممن يقتص آثاركم ، ويسلك سبيلكم ، ويهتدي بهداكم ، ويحشر في زمرتكم ، ويَكِرُّ في رجعتكم ، ويُمَلَّكُ في دولتكم ، ويُشَرَّفُ في عافيتكم ، ويُمَكَّنُ في أيامكم ، وتقر عينه غداً برؤيتكم.
+<br/>
+بأبي أنتم وأمي ، ونفسي وأهلي ومالي ، من أراد الله بدأ بكم ، ومن وحده قبل عنكم ، ومن قصده توجه إليكم ، مواليَّ ، لا أحصي ثناءكم ، ولا أبلغ من المدح كنهكم ، ومن الوصف قدركم ، وأنتم نور الأخيار ، وهداة الأبرار ، وحجج الجبار.
+<br/>
+بكم فتح الله ، وبكم يختم ، وبكم ينزل الغيث ، وبكم يمسك السماء أن تقع على الأرض إلا باذنه ، وبكم يُنَفِّسُ الهمَّ ، وبكم يكشف الضرَّ ، وعندكم ما تنزل به رسله ، وهبطت به ملائكته ، وإلى جدكم بعث الروح الأمين. آتاكم الله ما يؤت أحداً من العالمين ، طأطأ كل شريف لشرفكم ، وَبَخَعَ كل متكبر لطاعتكم ، وخضع كل جبار
+<br/>
+لفضلكم ، وذلَّ كل شئ لكم ، وأشرقت الأرض بنوركم ، وفاز الفائزون بولايتكم ، بكم يسلك إلى الرضوان ، وعلى من جحد ولايتكم غضب الرحمن.
+<br/>
+بأبي أنتم وأمي ونفسي وأهلي ومالي ، ذِكْرُكُم في الذاكرين ، وأسماؤكم في الأسماء وأجسادكم في الأجساد ، وأرواحكم في الأرواح ، وأنفسكم في النفوس ، وآثاركم في الآثار ، وقبوركم في القبور. فما أحلى أسماءكم ، وأكرم أنفسكم ، وأعظم شأنكم ، وأجل خطركم ، وأوفى عهدكم. كلامكم نورٌ ، وأمركم رشدٌ ، ووصيتكم التقوى ، وفعلكم الخير ، وعادتكم الإحسان ، وسجيتكم الكرم ، وشأنكم الحق والصدق والرفق ، وقولكم حُكم وحَتم ، ورأيكم علم وحلم وحزم ، إن ذكر الخير كنتم أوله ، وأصله ، وفرعه ، ومعدنه ، ومأواه ، ومنتهاه.
+<br/>
+بأبي أنتم وأمي ونفسي وأهلي ومالي ، كيف أصف حسن ثنائكم ، وكيف أحصي جميل بلائكم ، وبكم أخرجنا الله من الذل ، وفرج عنا غمرات الكروب ، وأنقذنا من شفا جرف الهلكات ومن النار.
+<br/>
+بأبي أنتم وأمي ونفسي ، بموالاتكم علمنا الله معالمَ ديننا ، وأصلح ما كان فسد من دنيانا ، وبموالاتكم تمت الكلمة ، وعظمت النعمة ، وائتلفت الفرقة ، وبموالاتكم تقبل الطاعة المفترضة ، ولكم المودة الواجبة ، والدرجات الرفيعة ، والمقام المحمود عند الله تعالى ، والمكان المعلوم ، والجاه العظيم ، والشأن الرفيع ، والشفاعة المقبولة.
+<br/>
+ربنا آمنا بما أنزلت واتبعنا الرسول فاكتبنا مع الشاهدين. ربنا لا تزغ قلوبنا بعد إذ هديتنا وهب لنا من لدنك رحمة إنك أنت الوهاب. سبحان ربنا إن كان وعد ربنا لمفعولا.
+<br/>
+<br/>
+ياوليَّ الله ، إن بينى وبين الله ذنوباً لا يأتي عليها إلا رضاكم ، فبحقِّ من ائتمنكم على سره ، واسترعاكم أمرَ خلقه ، وقَرَنَ طاعتكم بطاعته ، لمَّا استوهبتم ذنوبي ، وكنتم شفعائي ، إني لكم مطيع ، من أطاعكم فقد أطاع الله ، ومن عصاكم عصى الله ، ومن أحبكم فقد أحب الله ، ومن أبغضكم فقد أبغض الله.
+<br/>
+اللهم إني لو وجدت شفعاءَ أقرب إليك من محمد وأهل بيته الأخيار الأئمة الأبرار لجعلتهم شفعائي ، فبحقهم الذي أوجبت لهم عليك ، أسألك أن تدخلني في جملة العارفين بهم ، وبحقهم ، وفي زمرة المرجوين لشفاعتهم ، إنك أرحم الراحمين ».
+<br/><br/><br/>
+                        
+						</div>
+
+						
+						
+						
+					</div>
+				</div>
+			</div>
+		</div>
+			
+			
+		<script>
+			function playAudio_new(filename,is_from_web) {
+				$("#durationTimer").html("--:--");
+				$("#audioTimer").html("00:00");
+				
+				audio.stop();
+				setTimeout(function(){
+					playAudio(filename,is_from_web);
+				}, 600);
+			}
+		</script>
+		<div id="smgroup_audio_player" >
+				<span id="audioTimer" >00:00</span>&nbsp 
+				<span id="durationTimer" >--:--</span>
+				<div id="audioPosition" >
+					<input type="range" name="slider" id="slider" disabled="disabled" value="0" min="0" max="60" style="padding:0;margin:0;" />
+				</div>
+				<div class="audio_btn">
+					<input type="button" id="play" value="" class="play_it need_download" online="http://imamali.net/app-json/audio/jamee.mp3" /><!--play_type="offline"-->
+					<input type="button" id="play2" value="" />
+					<input type="button" id="pause" value="" />
+					<input type="button" id="stop" value="Stop" />
+				</div>
+		</div>
+		<div class="progress-bar-parent">
+			<div class="progress-bar green glow">
+				<div id="status"></div>
+				<span class="progress-bar-percent" style="width: 1%"></span>
+				<div id="descripion">
+					<div class="first">التحمیل</div>
+				</div>
+				<div id="abort_box"><input type="button" id="abort" value="إلغاء" /></div>
+			</div>
+		</div>
+			
+	</div>
+	
+	
+<script>
+	//init_audio("audio/roze/0.mp3");
+
+	audio_Timer = $("#audioTimer");
+	duration_Timer = $("#durationTimer");
+	slider_Timer = $("#slider");
+	
+	audio = null;
+	audioTimer = null;
+	pausePos = 0;
+	
+	function init_audio(my_file){
+		/*
+		if (audio) {
+			play_btn.css("display","block");
+			play2_btn.css("display","none");
+			pause_btn.css("display","none");
+			
+			slider_Timer.val(0);
+			stopAudio();
+		}
+		*/
+		// Phonegap is loaded and can be used
+		play_btn = $("#play");
+		play2_btn = $("#play2");
+		pause_btn = $("#pause");
+		stop_btn = $("#stop");
+		slider_Timer = $("#slider");
+		slider_range = slider_Timer;
+/*
+		play_btn.click(function(e){
+			e.preventDefault();
+			play_btn.css("display","none");
+			pause_btn.css("display","block");
+			slider_Timer.prop("disabled",false);
+			playAudio(my_file);
+		});
+*/
+		slider_Timer.on("change", function(){
+			//play_btn.prop("disabled",false);
+			//play2_btn.prop("disabled",false);
+			//pause_btn.prop("disabled",true);
+			play2_btn.css("display","block");
+			pause_btn.css("display","none");
+			
+			pausePos = slider_Timer.val();
+			formatTime(pausePos,audio_Timer);
+			pauseAudio();
+			formatTime(pausePos,audio_Timer);
+			audio.seekTo(pausePos*1000);
+			
+			setTimeout(function(){
+				pausePos = temp_pausePos;
+				audio.seekTo(pausePos*1000);
+				formatTime(pausePos,audio_Timer);
+				slider_Timer.val(pausePos);
+			}, 800);
+		});
+		
+		pause_btn.click(function(){	
+			play2_btn.css("display","block");
+			pause_btn.css("display","none");
+
+			pauseAudio();
+		});
+		
+		play2_btn.click(function(){	
+			pause_btn.css("display","block");
+			play2_btn.css("display","none");		
+			
+			PausePlayAudio();
+		});
+		
+		stop_btn.click(function(){
+			play_btn.css("display","block");
+			play2_btn.css("display","none");
+			pause_btn.css("display","none");
+			
+			slider_Timer.val(0);
+			stopAudio();
+		});
+		
+		
+		file = "audio/besmella.mp3";
+		if ( device.platform == 'Android' ){//Android,iOS,win7=WinCE,win8=Win32NT
+			file = "/android_asset/www/" + file;
+		}
+		audio = new Media(file, function(){ // success callback
+
+		}, function(error){ // error callback
+			//alert("code: "    + error.code    + "\n" + "message: " + error.message + "\n");
+			console.log("code: "    + error.code    + "\n" + "message: " + error.message + "\n");
+		});
+	}
+
+
+	function playAudio(file,is_from_web){
+		//alert(file);
+		
+		if (is_from_web==false){//Android,iOS,win7=WinCE,win8=Win32NT
+			file = file.replace("http://imamali.net/app-json/", "");
+		}
+		if ( device.platform == 'Android' && is_from_web==false ){//Android,iOS,win7=WinCE,win8=Win32NT
+			file = "/android_asset/www/" + file;
+		}
+		console.log("2");
+		if (audio) {
+			console.log("3");
+			audio.stop();
+			//audio.release();
+		}
+		console.log("4");
+		
+		$("#smgroup_audio_player").show();
+		play_btn.css("display","none");
+		play2_btn.css("display","none");
+		pause_btn.css("display","block");
+		slider_Timer.prop("disabled",false);
+		
+		audio = new Media(file, function(){ // success callback
+			console.log("playAudio():Audio Success");
+			play_btn.css("display","block");
+			play2_btn.css("display","none");
+			pause_btn.css("display","none");
+		
+			slider_Timer.val(0);
+			stopAudio();
+		}, function(error){ // error callback
+			//alert("code: "    + error.code    + "\n" + "message: " + error.message + "\n");
+			console.log("code: "    + error.code    + "\n" + "message: " + error.message + "\n");
+		});
+		//alert("3");
+		// get audio duration
+		var duration = audio.getDuration();
+		var duration_show = false;
+		
+		// set slider data
+		if( duration > 0 ){
+			formatTime(duration,duration_Timer);
+			slider_Timer.attr( "max", Math.round(duration) );
+			//slider_Timer.slider("refresh");
+			slider_Timer.val(0);
+			duration_show = true;
+		}
+
+		
+		// play audio
+		audio.play({ playAudioWhenScreenIsLocked : true });
+		
+		audio.seekTo(0);
+			
+		// update audio position every second
+		if (audioTimer == null) {
+			audioTimer = setInterval(function() {
+				// get audio position
+				audio.getCurrentPosition(
+					function(position) { // get position success
+						if (position > -1) {
+							setAudioPosition(position);
+						}
+					}, function(e) { // get position error
+						alert("Error getting pos=" + e);
+						//setAudioPosition(duration);
+					}
+				);
+				if(!duration_show){
+					duration = audio.getDuration();
+					if( duration > 0 ){
+						formatTime(duration,duration_Timer);
+						slider_Timer.attr( "max", Math.round(duration) );
+						//slider_Timer.slider("refresh");
+						duration_show = true;
+					}
+				}
+			}, 1000);
+		}
+	}
+
+
+	function pauseAudio() {
+		if (audio) {
+			audio.pause();
+		}
+	}
+	
+	function PausePlayAudio() {
+		if (audio) {
+			audio.pause();
+			audio.seekTo(pausePos*1000);
+			audio.play();
+		}
+	}
+
+
+	function stopAudio() {
+		if (audio) {
+			audio.stop();
+			audio.release();
+		}
+		clearInterval(audioTimer);
+		audioTimer = null;
+		pausePos = 0;
+		formatTime(0,audio_Timer);
+	}
+
+
+	function setAudioPosition(position) {
+		pausePos = position;
+		position = Math.round(position);
+		slider_Timer.val(position);
+		formatTime(position,audio_Timer);
+		//slider_Timer.slider("refresh");
+		//slider_Timer.val(0);
+	}
+
+	function formatTime(seconds,Timer) {
+		if (seconds <= 0)
+		{
+			Timer.html("00:00");
+			return;
+		}	
+		var minutes = Math.floor(seconds / 60);
+		
+		if (minutes < 10)
+			minutes = "0" + minutes;
+
+		seconds = seconds % 60;
+		if (seconds < 10)
+			seconds = "0" + seconds;
+		seconds = Math.round(seconds);
+		
+		Timer.html(minutes + ":" + seconds);
+	};
+</script>
+</body>
+</html>
