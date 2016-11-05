@@ -67,7 +67,7 @@
 	<plugin spec="https://github.com/fiscal-cliff/phonegap-plugin-brightness.git" source="git" />
 	<!-- <plugin spec="https://github.com/MobileChromeApps/cordova-plugin-zip.git" source="git" /> -->
 	<!-- <plugin name="com.downloadwink.phonegap.contentsync"	source="pgb" />-->	
-	<plugin spec="https://github.com/phonegap/phonegap-plugin-contentsync" source="git" />
+	<plugin spec="https://github.com/phonegap/phonegap-plugin-contentsync.git" source="git" />
 	
     <!-- 
         <gap:plugin name="com.phonegap.plugins.barcodescanner" />
@@ -75,7 +75,7 @@
     -->	
 	<!-- <gap:plugin name="cordova-plugin-x-socialsharing" source="npm" />-->
     <!--<gap:plugin name="com.phonegap.plugins.pushplugin" />-->
-    <plugin spec="https://github.com/phonegap/phonegap-plugin-push" source="git" />
+    <plugin spec="https://github.com/phonegap/phonegap-plugin-push.git" source="git" />
 	<gap:plugin name="hu.dpal.phonegap.plugins.uniquedeviceid" />
 	<gap:plugin name="com.phonegap.plugin.statusbar" />
 	<gap:config-file platform="ios" parent="UIStatusBarHidden">
